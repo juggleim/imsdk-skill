@@ -1,0 +1,710 @@
+---
+title: 消息监听
+hide_title: true
+sidebar_position: 3
+---
+
+<Tabs
+groupId="sdks-language"
+values={[
+{ label: 'Android', value: 'android', },
+{ label: 'iOS', value: 'ios', },
+{ label: 'JavaScript', value: 'js', },
+{ label: 'Flutter', value: 'flutter', },
+{ label: 'ReactNative', value: 'reactnative', },
+{ label: '鸿蒙', value: 'harmony', }
+]
+}>
+<TabItem value="android">
+
+**消息相关监听**
+
+可以设置多个监听。
+
+```java
+JIM.getInstance().getMessageManager().addListener("main", new IMessageManager.IMessageListener() {
+    /// 接收消息的回调
+    @Override
+    public void onMessageReceive(Message message) {
+        Log.d("TAG", "onMessageReceive, conversationType is " + message.getConversation().getConversationType() + ", conversationId is " + message.getConversation().getConversationId());
+        MessageContent content = message.getContent();
+        if (content instanceof TextMessage) {
+            Log.d("TAG", "text did receive, content is " + ((TextMessage) content).getContent());
+        } else if (content instanceof ImageMessage) {
+            Log.d("TAG", "image did receive, url is " + ((ImageMessage) content).getUrl());
+        } else if (content instanceof FileMessage) {
+            Log.d("TAG", "file did receive, name is " + ((FileMessage) content).getName());
+        } else if (content instanceof VoiceMessage) {
+            Log.d("TAG", "voice did receive");
+        }
+    }
+
+    /// 消息撤回回调
+    @Override
+    public void onMessageRecall(Message message) {
+        Log.d("TAG", "onMessageRecall, messageId is " + message.getMessageId());
+    }
+
+    /// 消息修改回调
+    @Override
+    public void onMessageUpdate(Message message) {
+        Log.d("TAG", "onMessageUpdate, messageId is " + message.getMessageId());
+    }
+
+    /// 消息删除回调
+    /// conversation: 会话标识
+    /// clientMsgNos: 列表（本端消息唯一编号）
+    @Override
+    public void onMessageDelete(Conversation conversation, List<Long> clientMsgNos) {
+        Log.d("TAG", "onMessageDelete, conversation is " + conversation.getConversationId() + ", clientMsgNo is " + clientMsgNos);
+    }
+
+    /// 消息清除回调，表示清除特定会话中某个时间点之前的所有消息
+    /// conversation: 会话标识
+    /// timestamp: 时间戳（毫秒），timestamp 之前的消息被清除
+    /// senderId: 若不为空，表示只清除发送者 id 为 senderId 的消息
+    @Override
+    public void onMessageClear(Conversation conversation, long timestamp, String senderId) {
+        Log.d("TAG", "onMessageClear, conversation is " + conversation.getConversationId() + ", timestamp is " + timestamp + ", senderId is " + senderId);
+    }
+
+    /// 新增消息回应的回调
+    /// conversation: 所属会话
+    /// reaction: 新增的消息回应
+    @Override
+    public void onMessageReactionAdd(Conversation conversation, MessageReaction reaction) {
+
+    }
+
+    /// 删除消息回应的回调
+    /// conversation: 所属会话
+    /// reaction: 删除的消息回应
+    void onMessageReactionRemove(Conversation conversation, MessageReaction reaction) {
+
+    }
+
+    /// 消息置顶的回调
+    /// message: 对应的消息
+    /// operator: 操作置顶的用户
+    /// isTop: true false 表示取消置顶
+    void onMessageSetTop(Message message, UserInfo operator, boolean isTop) {
+
+    }
+});
+
+```
+
+**消息阅读状态相关监听**
+
+可以设置多个监听。
+
+```java
+JIM.getInstance().getMessageManager().addReadReceiptListener("main", new IMessageManager.IMessageReadReceiptListener() {
+  /// 单聊消息阅读回调
+  /// conversation: 所在会话
+  /// messageIds: 消息 id 数组
+	@Override
+	public void onMessagesRead(Conversation conversation, List<String> messageIds) {
+		Log.d("TAG", "onMessageRead, count is " + messageIds.size() + ", conversationType is " + conversation.getConversationType() + ", conversationId is " + conversation.getConversationId());
+	}
+
+  /// 群消息阅读回调
+  /// conversation: 所在会话
+  /// messages: key 为 messageId
+	@Override
+	public void onGroupMessagesRead(Conversation conversation, Map<String, GroupMessageReadInfo> messages) {
+		Log.d("TAG", "onGroupMessagesRead, conversationType is " + conversation.getConversationType() + ", id is " + conversation.getConversationId() + ", count is " + messages.size());
+	}
+});
+
+```
+
+**消息销毁相关监听**
+
+可以设置多个监听。
+
+```java
+JIM.getInstance().getMessageManager().addDestroyListener("main", new IMessageManager.IMessageDestroyListener() {
+  /**
+    * 消息销毁时间更新回调（一般发生在阅后即焚之类的场景）
+    * @param messageId 消息 id
+    * @param conversation 所在会话
+    * @param destroyTime 更新后的销毁时间
+    */
+	@Override
+	public void onMessageDestroyTimeUpdate(String messageId, Conversation conversation, long destroyTime) {
+
+	}
+});
+```
+**消息加解密相关回调**
+
+消息加解密只能设置一个监听。
+
+```java
+JIM.getInstance().getMessageManager().setPreprocessor(new IMessageManager.IMessagePreprocessor() {
+  /**
+    * 消息加密的回调
+    * 回调时机：消息入库之后，发送之前
+    * @param content 待发送的消息内容，已序列化成 byte[]
+    * @param conversation 所在会话
+    * @param contentType 消息类型
+    * @return 处理后的消息内容。
+    */
+	@Override
+	public byte[] encryptMessageContent(byte[] content, Conversation conversation, String contentType) {
+
+	}
+
+  /**
+    * 消息解密的回调
+    * 回调时机：接收到消息，入库之前
+    * @param content 接收到的消息内容, byte[] 类型，还没反序列化
+    * @param conversation 所在会话
+    * @param contentType 消息类型
+    * @return 处理后的消息内容。
+    */
+	@Override
+	public byte[] decryptMessageContent(byte[] content, Conversation conversation, String contentType) {
+
+	}
+});
+```
+
+</TabItem>
+<TabItem value="ios">
+
+**消息相关监听**
+
+可以设置多个代理。
+
+```objectivec
+[JIM.shared.messageManager addDelegate:self];
+
+/// 接收消息的回调
+- (void)messageDidReceive:(JMessage *)message {
+    NSLog(@"messageDidReceive conversationType is %d, conversationId is %@", message.conversation.conversationType, message.conversation.conversationId);
+    JMessageContent *content = message.content;
+    if ([content isKindOfClass:[JTextMessage class]]) {
+        NSLog(@"text messageDidReceive, content is %@", ((JTextMessage *)content).content);
+    } else if ([content isKindOfClass:[JImageMessage class]]) {
+        NSLog(@"image messageDidReceive, url is %@", ((JImageMessage *)content).url);
+    } else if ([content isKindOfClass:[JFileMessage class]]) {
+        NSLog(@"file messageDidReceive");
+    } else if ([content isKindOfClass:[JVoiceMessage class]]) {
+        NSLog(@"voice messageDidReceive");
+    }
+}
+
+/// 消息撤回的回调
+- (void)messageDidRecall:(JMessage *)message {
+    NSLog(@"messageDidRecall");
+}
+
+/// 消息修改的回调
+- (void)messageDidUpdate:(JMessage *)message {
+    NSLog(@"messageDidRecall");
+}
+
+/// 消息删除的回调
+- (void)messageDidDelete:(JConversation *)conversation
+            clientMsgNos:(NSArray <NSNumber *> *)clientMsgNos {
+
+}
+
+/// 消息清除回调，表示清除特定会话中某个时间点之前的所有消息
+/// - Parameters:
+///   - conversation: 被清除消息所属的会话标识
+///   - timestamp: 时间戳（毫秒），timestamp 之前的消息被清除
+///   - senderId: 若不为空，表示只清除发送者 id 为 senderId 的消息
+- (void)messageDidClear:(JConversation *)conversation
+              timestamp:(long long)timestamp
+               senderId:(NSString *)senderId {
+
+}
+
+/// 新增消息回应的回调
+/// - Parameter reaction: 新增的消息回应
+/// - Parameter conversation: 所属会话
+- (void)messageReactionDidAdd:(JMessageReaction *)reaction
+               inConversation:(JConversation *)conversation {
+
+}
+
+/// 删除消息回应的回调
+/// - Parameter reaction: 删除的消息回应
+/// - Parameter conversation: 所属会话
+- (void)messageReactionDidRemove:(JMessageReaction *)reaction
+                  inConversation:(JConversation *)conversation {
+
+}
+
+/// 消息置顶的回调
+/// - Parameters:
+///   - isTop: YES 表示置顶，NO 表示取消置顶
+///   - message: 对应的消息
+///   - userInfo: 操作置顶的用户
+- (void)messageDidSetTop:(BOOL)isTop
+                 message:(JMessage *)message
+                    user:(JUserInfo *)userInfo {
+
+}
+```
+
+**消息阅读状态相关监听**
+
+可以设置多个代理。
+
+```objectivec
+[JIM.shared.messageManager addReadReceiptDelegate:self];
+
+/// 单聊消息阅读回调
+/// - Parameters:
+///   - messageIds: 消息 id 数组
+///   - conversation: 所在会话
+- (void)messagesDidRead:(NSArray<NSString *> *)messageIds inConversation:(JConversation *)conversation {
+    NSLog(@"messagesDidRead");
+}
+
+/// 群消息阅读回调
+/// - Parameters:
+///   - msgs: key 为 messageId
+///   - conversation: 所在会话
+- (void)groupMessagesDidRead:(NSDictionary<NSString *,JGroupMessageReadInfo *> *)msgs inConversation:(JConversation *)conversation {
+    NSLog(@"groupMessagesDidRead, groupId is %@", conversation.conversationId);
+}
+
+```
+
+**消息销毁相关监听**
+
+可以设置多个代理。
+
+```objectivec
+[JIM.shared.messageManager addDestroyDelegate:self];
+
+/// 消息销毁时间更新回调（一般发生在阅后即焚之类的场景）
+/// - Parameters:
+///   - messageId: 消息 id
+///   - conversation: 所在会话
+///   - destroyTime: 更新后的销毁时间
+- (void)messageDestroyTimeDidUpdate:(NSString *)messageId
+                     inConversation:(JConversation *)conversation
+                        destroyTime:(long long)destroyTime {
+
+}
+
+```
+
+**消息加解密相关回调**
+
+消息加解密只能设置一个代理。
+
+```objectivec
+[JIM.shared.messageManager setPreprocessor:self];
+
+/// 消息加密的回调
+/// 回调时机：消息入库之后，发送之前
+/// - Parameter content: 待发送的消息内容，已序列化成 NSData
+/// - Parameter conversation: 所在会话
+/// - Parameter contentType: 消息类型
+/// - Return: 处理后的消息内容。
+- (NSData *)encryptMessageContent:(NSData *)content
+                   inConversation:(JConversation *)conversation
+                      contentType:(NSString *)contentType {
+
+}
+
+/// 消息解密的回调
+/// 回调时机：接收到消息，入库之前
+/// - Parameter content: 接收到的消息内容，NSData 格式，还没反序列化
+/// - Parameter conversation: 所在会话
+/// - Parameter contentType: 消息类型
+/// - Return: 处理后的消息内容。
+- (NSData *)decryptMessageContent:(NSData *)content
+                   inConversation:(JConversation *)conversation
+                      contentType:(NSString *)contentType {
+
+}
+```
+
+</TabItem>
+<TabItem value="js">
+
+全局只需设置一次，多次设置会覆盖，其他人给当前用户发送消息会触发消息监听，消息格式请查看 [Message 结构](/docs/client/sdkintro/msg/message/)，Event 说明请查看 [监听枚举](/docs/client/sdkintro/enum/web/#listener)
+
+```js
+let { Event } = JIM;
+
+### 消息接收监听
+
+jim.on(Event.MESSAGE_RECEIVED, (message) => {
+  console.log(message);
+});
+
+
+### 消息已读监听
+
+jim.on(Event.MESSAGE_READ, (notify) => {
+  /*
+    处理逻辑：
+      1、此处可以更新内存中的消息 isRead 状态为 true
+      2、历史消息中的消息状态 SDK 会自动处理
+      3、获取历史消息会返回最新的阅读状态
+
+    notify 示例:
+      {
+        conversationType: 1,
+        conversationId: "dDshdk1d4",
+        // 对方已读的消息 Id 列表，通过 messageId 变更消息已读状态
+        messages: [{
+          messageId:"na4d4nfa2d6gnn28",
+
+          // 仅群组会话是有 readCount 和 unreadCount，两者相加等于发送消息时的群组的总人数
+          readCount: 1,
+          unreadCount: 2
+        }],
+        // 通知消息是否为自己的另外一端发送,
+        isSender: false,
+        // 发送通知消息的用户 Id
+        senderId: 'dadkdks',
+        // 阅读的时间
+        readTime: 1761912175539
+      }
+  */
+ console.log(notify);
+  /*
+    使用阅读后即时焚功能说明：
+
+    1、前提说明
+
+      (1)在线接收消息或获取历史消息的 message.lifeTimeAfterRead > 0 表示是阅后即焚消息
+
+      (2)销毁时间计算逻辑 notify.messages[0].readTime + message.lifeTimeAfterRead
+
+    2、已展示消息包含 notify.messages 中的 messageId 且 message.lifeTimeAfterRead > 0 要倒计时在页面移除消息
+
+    3、如果已展示消息不包含 notify.messages 中的 messageId 忽略即可，服务端会进行自动删除
+
+    4、单聊和群聊阅后即焚的通常处理逻辑
+
+    （1）单聊发送方：收到对方已读通知后按照 message.lifeTimeAfterRead 进行倒计时清除
+
+    （2）单聊接收方：发送已读通知后按照 message.lifeTimeAfterRead 进行倒计时清除
+
+    （3）群聊发送方：notify.messages[0].unreadCount 为 0 时表示全部已读，消息发送者按 message.lifeTimeAfterRead 清理
+
+    （4）群聊接收方：发送已读回执后，按 message.lifeTimeAfterRead 清理
+  */
+});
+
+
+### 消息清除监听
+
+jim.on(Event.MESSAGE_CLEAN, (notify) => {
+  /*
+  notify 示例:
+    {
+      conversationType: 1,
+      conversationId: "dDshdk1d4",
+      cleanTime: 1716471002135
+    }
+  */
+  console.log(notify);
+});
+
+
+### 消息撤回监听
+
+jim.on(Event.MESSAGE_RECALLED, (notify) => {
+  /*
+  处理逻辑：开发者只需更新内存中的消息撤回状态，SDK 会自动处理本地及服务端存储的历史消息
+
+  notify 示例:
+    {
+      conversationType: 1,
+      conversationId: "dDshdk1d4",
+      content: {
+        // 被撤回的消息的 UID
+        messageId: "nq4d9xsfgeghvtnd",
+        // 被撤回消息的消息时间
+        sentTime: 1712903378965
+      },
+      sender: {
+        id: 'dkdosd',
+        name: 'chater',
+        portrait: 'https://xxx.example.com/avatar.png'
+      }
+    }
+  */
+  console.log(notify);
+});
+
+
+### 消息删除监听
+
+jim.on(Event.MESSAGE_REMOVED, (notify) => {
+  /*
+    notify 示例:
+      {
+       conversationType: 1,
+        conversationId: "dDshdk1d4",
+        content: {
+          messages: [{ messageId: "nq4d9xsfgeghvtnd" }],
+        }
+      }
+    */
+  console.log(notify);
+});
+
+
+### 消息修改监听
+
+jim.on(Event.MESSAGE_UPDATED, (notify) => {
+  /*
+    处理逻辑：
+      1、开发者需要将内存中 message 的 isUpdated 更新为 true
+      2、获取历史消息时 SDK 会自动将 isUpdated 设置为 true
+      3、此处更新内存即可，如内存无被修改的消息，可忽略
+
+    notify 示例:
+      {
+        conversationType: 1,
+        conversationId: "dDshdk1d4",
+        // 被修改的消息 Id，通过消息 ID 更新 UI 已展示的消息
+        messageId: 'nq4d9xsfgeghvtnd',
+        content: {
+          // 最新的消息内容
+          content: 'new content'
+        },
+      }
+   */
+  console.log(notify);
+});
+```
+</TabItem>
+<TabItem value="harmony">
+
+可以设置多个监听。
+
+```js
+
+//收到新消息
+JuggleIm.instance.getMessageManager().addMsgReceivedListener((msg)=>{
+
+})
+
+//消息撤回监听
+JuggleIm.instance.getMessageManager().addMsgRecalledListener((msg)=>{
+
+})
+
+//消息修改监听
+JuggleIm.instance.getMessageManager().addMsgModifiedListener((msg)=>{
+
+})
+
+//消息删除监听
+JuggleIm.instance.getMessageManager().addMsgDeletedListener((conver,msgIds)=>{
+
+})
+
+//消息清除监听
+JuggleIm.instance.getMessageManager().addMsgCleanedListener((conver,cleanTime,senderId)=>{
+
+})
+```
+</TabItem>
+<TabItem value="reactnative">
+
+**消息相关监听**
+
+可以设置多个监听，每个监听需要指定唯一的 key，返回的函数可用于取消监听。
+
+```typescript
+import JuggleIM from 'juggleim-rnsdk';
+
+// 添加消息监听，返回取消监听的函数
+const unsubscribeMessage = JuggleIM.addMessageListener('message_key', {
+  // 接收消息的回调
+  onMessageReceive: (message) => {
+    console.log('Received message:', message);
+  },
+
+  // 消息撤回回调
+  onMessageRecall: (message) => {
+    console.log('Message recalled:', message);
+  },
+
+  // 消息修改回调
+  onMessageUpdate: (message) => {
+    console.log('Message updated:', message);
+  },
+
+  // 消息删除回调
+  // conversation: 会话标识
+  // clientMsgNos: 列表（本端消息唯一编号）
+  onMessageDelete: (conversation, clientMsgNos) => {
+    console.log('Messages deleted:', conversation, clientMsgNos);
+  },
+
+  // 消息清除回调，表示清除特定会话中某个时间点之前的所有消息
+  // conversation: 会话标识
+  // timestamp: 时间戳（毫秒），timestamp 之前的消息被清除
+  // senderId: 若不为空，表示只清除发送者 id 为 senderId 的消息
+  onMessageClear: (conversation, timestamp, senderId) => {
+    console.log('Messages cleared:', conversation, timestamp, senderId);
+  },
+
+  // 新增消息回应的回调
+  // conversation: 所属会话
+  // reaction: 新增的消息回应
+  onMessageReactionAdd: (conversation, reaction) => {
+    console.log('Message reaction added:', conversation, reaction);
+  },
+
+  // 删除消息回应的回调
+  // conversation: 所属会话
+  // reaction: 删除的消息回应
+  onMessageReactionRemove: (conversation, reaction) => {
+    console.log('Message reaction removed:', conversation, reaction);
+  },
+
+  // 消息置顶的回调
+  // message: 对应的消息
+  // operator: 操作置顶的用户
+  // isTop: true false 表示取消置顶
+  onMessageSetTop: (message, operator, isTop) => {
+    console.log('Message set top:', message, operator, isTop);
+  }
+});
+
+// 取消监听
+// unsubscribeMessage();
+```
+
+**消息阅读状态相关监听**
+
+```typescript
+// 添加消息阅读状态监听，返回取消监听的函数
+const unsubscribeReadReceipt = JuggleIM.addMessageReadReceiptListener('read_receipt_key', {
+  // 单聊消息阅读回调
+  // conversation: 所在会话
+  // messageIds: 消息 id(messageId) 数组
+  onMessagesRead: (conversation, messageIds) => {
+    console.log('Messages read:', conversation, messageIds);
+  },
+
+  // 群消息阅读回调
+  // conversation: 所在会话
+  // messages: key 为 messageId, value 为阅读状态
+  onGroupMessagesRead: (conversation, messages) => {
+    console.log('Group messages read info updated:', conversation, messages);
+  }
+});
+
+// 取消监听
+// unsubscribeReadReceipt();
+```
+
+**消息销毁相关监听**
+
+```typescript
+// 添加消息销毁监听，返回取消监听的函数
+const unsubscribeDestroy = JuggleIM.addMessageDestroyListener('destroy_key', {
+  // 消息销毁时间更新回调（一般发生在阅后即焚之类的场景）
+  // messageId 消息 id
+  // conversation 所在会话
+  // destroyTime 更新后的销毁时间
+  onMessageDestroyTimeUpdate: (messageId, conversation, destroyTime) => {
+    console.log('Message destroy time updated:', messageId, conversation, destroyTime);
+  }
+});
+
+// 取消监听
+// unsubscribeDestroy();
+```
+
+</TabItem>
+<TabItem value="flutter" label="Flutter">
+
+**消息相关监听**
+
+连接监听仅支持设置一次，多次设置会覆盖之前的监听，如果有多处监听，建议在一个监听中处理所有状态，在业务层进行做二次事件分发。
+
+```dart
+// 接收消息的回调
+JuggleIm.instance.onMessageReceive = (Message message) {
+};
+
+// 消息撤回回调
+JuggleIm.instance.onMessageRecall = (Message message) {
+};
+
+// 消息修改回调
+JuggleIm.instance.onMessageUpdate = (Message message) {
+};
+
+// 消息删除回调
+// conversation: 会话标识
+// list: 列表（本端消息唯一编号 clientMsgNo）
+JuggleIm.instance.onMessageDelete = (Conversation conversation, List<int> clientMsgNoList) {
+};
+
+// 消息清除回调，表示清除特定会话中某个时间点之前的所有消息
+// conversation: 会话标识
+// timestamp: 时间戳（毫秒），timestamp 之前的消息被清除
+// senderId: 若不为空，表示只清除发送者 id 为 senderId 的消息
+JuggleIm.instance.onMessageClear = (Conversation conversation, int timestamp, String? senderId) {
+};
+
+// 新增消息回应的回调
+// conversation: 所属会话
+// reaction: 新增的消息回应
+JuggleIm.instance.onMessageReactionAdd = (Conversation conversation, MessageReaction reaction) {
+};
+
+// 删除消息回应的回调
+// conversation: 所属会话
+// reaction: 删除的消息回应
+JuggleIm.instance.onMessageReactionRemove = (Conversation conversation, MessageReaction reaction) {
+};
+
+// 消息置顶的回调
+// message: 对应的消息
+// operator: 操作置顶的用户
+// isTop: true false 表示取消置顶
+JuggleIm.instance.onMessageSetTop = (Message message, String operator, bool isTop) {
+};
+```
+
+**消息阅读状态相关监听**
+
+```dart
+// 单聊消息阅读回调
+// conversation: 所在会话
+// list: 消息 id(messageId) 数组
+JuggleIm.instance.onMessagesRead = (Conversation conversation, List<String> messageIdList) {
+};
+
+// 群消息阅读回调
+// conversation: 所在会话
+// messages: key 为 messageId, value 为阅读状态
+JuggleIm.instance.onGroupMessagesRead = (Conversation conversation, Map<String, GroupMessageReadInfo> messages) {
+};
+```
+
+**消息销毁相关监听**
+
+```dart
+// 消息销毁时间更新回调（一般发生在阅后即焚之类的场景）
+// messageId 消息 id
+// conversation 所在会话
+// destroyTime 更新后的销毁时间
+JuggleIm.instance.onMessageDestroyTimeUpdate = (String messageId, Conversation conversation, int destroyTime) {
+};
+```
+
+
+</TabItem>
+</Tabs>

@@ -1,0 +1,144 @@
+---
+title: 初始化
+hide_title: true
+sidebar_position: 0
+---
+
+<Tabs
+groupId="sdks-language"
+values={[
+{ label: 'Android', value: 'android', },
+{ label: 'iOS', value: 'ios', },
+{ label: 'JavaScript', value: 'js', },
+{ label: 'Flutter', value: 'flutter', },
+{ label: 'ReactNative', value: 'reactnative', },
+{ label: '鸿蒙', value: 'harmony', }
+]
+}>
+<TabItem value="android">
+
+SDK 采用单例模式，全局仅需初始化一次。
+
+**参数说明**
+
+| 参数       | 类型    |        说明                            | 最低版本     |
+|-----------|---------|----------------------------------------|----------|
+| appkey    | String  | 应用唯一标识，创建应用获取，每个 appkey 之间数据隔离，多端共用一个 appkey | 1.0.0    |
+
+**示例代码**
+
+```java
+List<String> serverList = new ArrayList<>();
+serverList.add("wss://ws.im.com");// "wss://ws.im.com" 替换成部署好的 server url
+JIM.getInstance().setServerUrls(serverList);
+JIM.getInstance().init(this, "appkey");
+```
+
+</TabItem>
+<TabItem value="ios">
+
+SDK 采用单例模式，全局仅需初始化一次。
+
+**参数说明**
+
+| 参数       | 类型    |        说明                            | 最低版本     |
+|-----------|---------|----------------------------------------|----------|
+| appKey    | NSString  | 应用唯一标识，创建应用获取，每个 appkey 之间数据隔离，多端共用一个 appkey | 1.0.0    |
+
+
+**示例代码**
+
+```objectivec
+[JIM.shared setServerUrls:@[@"wss://ws.im.com"]];// "wss://ws.im.com" 替换成部署好的 server url
+[JIM.shared initWithAppKey:@"appkey"];
+```
+
+</TabItem>
+<TabItem value="js">
+
+Web SDK 采用单例模式，全局只需初始化一次，连接、会话、消息相关的 API 均在实例对象中，首次集成调试，请优先通过 **[QuickStart 集成](../../quickstart/web/quickstart)**，事半功倍。
+
+**参数说明**
+
+| 参数       | 类型    | 必填 | 默认值    |        说明                            | 最低版本     |
+|-----------|---------|-------|-----------|----------------------------------------|----------|
+| appkey    | String  | 是    | 无        | 应用唯一标识，创建应用获取，每个 AppKey 之间数据隔离 | 1.0.0    |
+| serverList   | Array  | 是     | 无 | IM Server 地址，部署后可得到 `Server Url`` | 1.0.0    |
+| isSync    | Boolean | 否    | true      | 连接成功后是否同步离线时收到的消息，离线消息保留最近 24 小时，是否拉取离线消息不影响会话和未读消息数 | 1.0.0    |
+| upload    | Object  | 否    |           | 上传组件，支持七牛、阿里文件存储，详见 [发送文件消息示例](../../quickstart/web/send_file) | 1.0.0    |
+
+**示例代码**
+
+```js
+let jim = JIM.init({
+  appkey: 'Your AppKey',
+  serverList: ['部署后可得到 Server Url']
+});
+
+```
+</TabItem>
+
+<TabItem value="flutter">
+
+SDK 采用单例模式，全局仅需初始化一次，初始化前需要先设置服务器地址。服务器地址是提前部署的 IM Server 地址，并且在 `init` 之前调用 `setServers` 方法设置。
+
+**参数说明**
+
+| 参数       | 类型    |        说明                            | 最低版本     |
+|-----------|---------|----------------------------------------|----------|
+| appkey    | String  | 应用唯一标识，创建应用获取，每个 appkey 之间数据隔离，多端共用一个 appkey | 1.0.0    |
+
+**示例代码**
+
+```dart
+// **第一步** 将 "wss://ws.im.com" 替换成部署好的 IM Server 地址
+await JuggleIm.instance.setServers(["wss://ws.im.com"]);
+
+// **第二步** 调用 init 方法初始化 SDK
+await JuggleIm.instance.init('appkey');
+```
+
+</TabItem>
+
+<TabItem value="reactnative">
+
+SDK 采用单例模式，全局仅需初始化一次，初始化前需要先设置服务器地址。
+
+**参数说明**
+
+| 参数       | 类型    |       说明                            | 最低版本     |
+|-----------|---------|----------------------------------------|----------|
+| appkey    | String  | 应用唯一标识，创建应用获取，每个 appkey 之间数据隔离，多端共用一个 appkey | 1.0.0    |
+| serverList | String[] | 服务器��址列表 | 1.0.0 |
+
+**示例代码**
+
+```typescript
+import JuggleIM from 'juggleim-rnsdk';
+
+// **第一步** 设置服务器地址列表
+JuggleIM.setServerUrls(['wss://ws.im.com']);
+
+// **第二步** 调用 init 方法初始化 SDK
+JuggleIM.init('your-appkey');
+```
+
+</TabItem>
+
+<TabItem value="harmony">
+
+SDK 采用单例模式，全局仅需初始化一次。
+
+| 参数       | 类型    |        说明                            | 最低版本     |
+|-----------|---------|----------------------------------------|----------|
+| serverUrl | string  | 服务器部署后，对外的长连接地址 | |
+| appkey    | string  | 应用唯一标识，创建应用获取，每个 appkey 之间数据隔离，多端共用一个 appkey | 1.0.0    |
+
+**示例代码**
+
+```js
+JuggleIm.instance.init("{serverUrl}","{appkey}")
+```
+
+</TabItem>
+</Tabs>

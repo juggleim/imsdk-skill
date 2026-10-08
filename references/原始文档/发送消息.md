@@ -1,0 +1,227 @@
+---
+title: 发送消息
+hide_title: true
+sidebar_position: 1
+---
+
+<Tabs
+groupId="sdks-language"
+values={[
+{ label: 'Android', value: 'android', },
+{ label: 'iOS', value: 'ios', },
+{ label: 'JavaScript', value: 'js', },
+{ label: 'Flutter', value: 'flutter', },
+{ label: 'ReactNative', value: 'reactnative', },
+]
+}>
+<TabItem value="android">
+
+**参数说明**
+
+| 名称                           | 类型    | 描述                                                         | 版本     |
+|-------------------------------|---------|--------------------------------------------------------------|----------|
+| content                        | MessageContent  | 消息实体                                           | 1.0.0    |
+| conversation                   | Conversation  | 会话标识                          | 1.0.0    |
+| callback         | ISendMessageCallback  | 回调 | 1.0.0    |
+
+**示例代码**
+
+```java
+TextMessage text = new TextMessage("Text message");
+Conversation conversation = new Conversation(Conversation.ConversationType.PRIVATE, "userid1");
+IMessageManager.ISendMessageCallback callback = new IMessageManager.ISendMessageCallback() {
+    @Override
+    public void onSuccess(Message message) {
+        Log.i("TAG", "send message success");
+    }
+
+    @Override
+    public void onError(Message message, int errorCode) {
+        Log.i("TAG", "send message error, code is " + errorCode);
+    }
+};
+Message message = JIM.getInstance().getMessageManager().sendMessage(text, conversation, callback);
+Log.i("TAG", "after send, clientMsgNo is " + message.getClientMsgNo());
+```
+
+</TabItem>
+<TabItem value="ios">
+
+
+**参数说明**
+
+| 名称                           | 类型    | 描述                                                         | 版本     |
+|-------------------------------|---------|--------------------------------------------------------------|----------|
+| content                        | JMessageContent  | 消息实体                                           | 1.0.0    |
+| conversation                   | JConversation  | 会话标识                          | 1.0.0    |
+| successBlock         |   | 成功回调 | 1.0.0    |
+| errorBlock                   |   | 失败回调 | 1.0.0    |
+
+**示例代码**
+
+```objectivec
+//文本消息
+JConversation *conversation = [[JConversation alloc] initWithConversationType:JConversationTypePrivate conversationId:@"userid2"];
+JTextMessage *text = [[JTextMessage alloc] initWithContent:@"test text message"];
+JMessage *m = [JIM.shared.messageManager sendMessage:text
+                                      inConversation:conversation
+                                             success:^(JMessage *message) {
+        NSLog(@"sendMessage success");
+    } error:^(JErrorCode errorCode, JMessage *message) {
+        NSLog(@"sendMessage error");
+    }];
+NSLog(@"after send, m.clientMsgNo is %lld", m.clientMsgNo);
+```
+
+</TabItem>
+<TabItem value="js">
+
+**参数说明**
+
+| 名称                           | 类型    | 必填   | 默认值  | 描述                                                         | 版本     |
+|--------------------------------|---------|--------|--------|--------------------------------------------------------------|----------|
+| message                        | Object  | 是     |        | 消息对象                                                      | 1.0.0    |
+| message.conversationType       | Number  | 是     |        | [会话类型](../../../enum/web#conversation)                            | 1.0.0    |
+| message.conversationId         | String  | 是     |        | 会话 Id，会话类型是 `PRIVATE` 时，会话 Id 是接收方的 userId，会话类型是 `GROUP` 时是群组 Id | 1.0.0    |
+| message.name                   | String  | 是     |        | 消息名称，根据实际需要发送不同消息类型，详细枚举请查看 [MessageType](../../../enum/web#message) | 1.0.0    |
+| message.content                | Object  | 是     |        | 消息内容，构建 `message.name` 消息                              | 1.0.0    |
+| message.referMsg               | Object  | 否     |  无    | 引用回复消息，参数要求是完整的 [Message](../../../msg/message)          | 1.0.0    |
+| message.mentionInfo            | Object  | 否     |  无    | conversationType 为 `GROUP` 时有效，设置 mentionInfo 表示本条消息是 @ 消息 | 1.0.0    |
+| mentionInfo.mentionType        | Number  | 否     |  无    | @ 类型，详细可查看 [@ 消息枚举](../../../enum/web#mention) 说明         | 1.0.0    |
+| mentionInfo.members            | Array   | 否     |  无    | @ 指定人列表，SDK 会优先根据 [@ 消息枚举](../../../enum/web#mention) 判断消息的 @ 类型         | 1.0.0    |
+| lifeTime                   | Number    | 否    |  0    |消息的销毁时间段，必须大于 `0`, 单位 `ms`, 例如 60s: `1 * 60 * 1000`   | 1.9.0    |
+| lifeTimeAfterRead             | Number    | 否    |  0    |消息的阅后即焚的时间段，必须大于 0, 单位 `ms`, 例如 60s: `1 * 60 * 1000`  | 1.9.0    |
+**callbacks 参数说明**
+
+| 名称                           | 类型    | 必填   | 默认值  | 描述                                                         | 版本     |
+|--------------------------------|---------|--------|--------|--------------------------------------------------------------|----------|
+| callbacks                      | Object  | 否     |        | 回调对象                                                      | 1.0.0    |
+| callbacks.onbefore             | Function| 否     |        | 消息发送前回调，此方法触发后会返回临时消息标识 `tid`，可向页面渲染消息，消息发送成功后台根据 `tid` 更新消息状态| 1.0.0    |
+
+**成功回调**
+
+| 名称      | 类型    | 描述                                                                      | 版本   |
+|-----------|---------|---------------------------------------------------------------------------|--------|
+| message   | Object  | 发送成功后返回带 `messageId` 和 `sentTime` 消息对象，消息结构请查看 [Message](../../../msg/message) | 1.0.0  |
+
+:::simple 特殊说明
+IM Server 支持发送时拦截替换消息，例如发送 `图片消息`，`IM Server` 支持将 `图片消息` 替换为 `文本消息`，收发双方表现如下：
+
+> 接收方：看到的是替换后的 `文本消息`
+
+> 发送方：当前端收到会在消息成功回调中返回替换后的新消息，`message.name` 和 `message.content` 会替换成新内容，`messageId` 和 `sentTime` 处理逻辑不变。
+:::
+
+
+**失败回调**
+
+| 名称   | 类型    | 描述                                                      | 版本   |
+|--------|---------|-----------------------------------------------------------|--------|
+| result | Object  | 发送失败后会返回对象中包含 `tid` 属性信息，同时包含 `error` 信息，可以直接查看 `error.msg`，或者查看 [状态码](../../../status_code/web) | 1.0.0  |
+
+**示例代码**
+```js
+let { ConversationType, MessageType, MentionType } = JIM;
+
+let msg = {
+  conversationType: ConversationType.GROUP,
+  conversationId: 'groupid1',
+  name: MessageType.TEXT,
+  content: {
+    content: 'hello world'
+  },
+  mentionInfo: {
+    mentionType: MentionType.ALL,
+    members: [{ id: 'userid2' }]
+  }
+};
+
+let callbacks = {
+  onbefore: (message) => {
+    // 渲染至页面，可通过 message.tid 做唯一标识
+  }
+};
+
+jim.sendMessage(msg, callbacks).then((message) => {
+  console.log(message);
+}, (result) => {
+  let { error, tid } = result;
+  // 可根据 tid 修改消息发送失败的状态, Web 端消息失败仅在 SDK 内存中保存，刷新后将无法获取到发送失败的消息
+  console.log(tid, error);
+});
+```
+</TabItem>
+<TabItem value="reactnative" label="ReactNative">
+
+由于发送消息是异步的，调用 `sendMessage` 会同步返回 `message` 对象，此时可优先向页面展示消息，并用 `message.clientMsgNo` 做唯一标识，`callback` 触发后可根据 `clientMsgNo` 做消息状态更新。
+
+**参数说明**
+
+| 名称                           | 类型    | 描述                                                         | 版本     |
+|-------------------------------|---------|--------------------------------------------------------------|----------|
+| content                        | MessageContent  | 消息实体                                           | 1.0.0    |
+| conversation                   | Conversation  | 会话标识                          | 1.0.0    |
+| callback         | SendMessageCallback  | 回调 | 1.0.0    |
+
+**示例代码**
+
+```typescript
+import JuggleIM from 'juggleim-rnsdk';
+
+const conversation = {
+  type: 1, // 1: 单聊, 2: 群聊
+  id: 'userId1'
+};
+
+const textMessage = {
+  contentType: 'jg:text',
+  content: 'Text message'
+};
+
+const callback = (message: any, errorCode: number) => {
+  if (errorCode === 0) {
+    console.log('sendMessage success, messageId is ' + message.messageId);
+  } else {
+    console.log('sendMessage error, errorCode is ' + errorCode.toString() + ', clientMsgNo is ' + message.clientMsgNo.toString());
+  }
+};
+
+JuggleIM.sendMessage({
+  conversation: conversation,
+  content: textMessage
+}, callback).then((message) => {
+  console.log('after send, clientMsgNo is ' + message.clientMsgNo);
+});
+```
+
+</TabItem>
+<TabItem value="flutter" label="Flutter">
+
+由于发送消息是异步的，调用 `sendMessage` 会同步返回 `message` 对象，此时可优先向页面展示消息，并用 `message.clientMsgNo` 做唯一标识，`callback` 触发后可根据 `clientMsgNo` 做消息状态更新。
+
+**参数说明**
+
+| 名称                           | 类型    | 描述                                                         | 版本     |
+|-------------------------------|---------|--------------------------------------------------------------|----------|
+| content                        | MessageContent  | 消息实体                                           | 0.6.3    |
+| conversation                   | Conversation  | 会话标识                          | 0.6.3    |
+| callback         | DataCallback  | 回调 | 0.6.3    |
+
+**示例代码**
+
+```dart
+Conversation conversation = Conversation(ConversationType.group, 'groupId1');
+TextMessage textMessage = TextMessage.content('Text message');
+DataCallback<Message> callback = (m, errorCode) {
+  if (errorCode == 0) {
+    print("sendMessage success, messageId is " + m.messageId);
+  } else {
+    print('sendMessage error, errorCode is ' + errorCode.toString() + ', clientMsgNo is ' + m.clientMsgNo!.toString());
+  }
+};
+
+Message message = await JuggleIm.instance.sendMessage(textMessage, conversation, callback);
+```
+
+</TabItem>
+</Tabs>

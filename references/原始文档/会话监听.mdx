@@ -1,0 +1,196 @@
+---
+title: 会话监听
+hide_title: true
+sidebar_position: 3
+---
+
+<Tabs
+groupId="sdks-language"
+values={[
+{ label: 'Android', value: 'android', },
+{ label: 'iOS', value: 'ios', },
+{ label: 'JavaScript', value: 'js', },
+{ label: 'Flutter', value: 'flutter', },
+{ label: 'ReactNative', value: 'reactnative', },
+{ label: '鸿蒙', value: 'harmony', }
+]
+}>
+<TabItem value="android">
+
+可以设置多个监听。
+
+```java
+JIM.getInstance().getConversationManager().addListener("main", new IConversationManager.IConversationListener() {
+  /// 会话新增回调
+  @Override
+  public void onConversationInfoAdd(List<ConversationInfo> conversationInfoList) {
+      Log.i("TAG", "onConversationInfoAdd, count is " + conversationInfoList.size());
+  }
+
+  /// 会话变更回调，会话信息任何变更都会触发该回调
+  @Override
+  public void onConversationInfoUpdate(List<ConversationInfo> conversationInfoList) {
+      Log.i("TAG", "onConversationInfoUpdate, count is " + conversationInfoList.size());
+  }
+
+  /// 会话删除回调
+  @Override
+  public void onConversationInfoDelete(List<ConversationInfo> conversationInfoList) {
+      Log.i("TAG", "onConversationInfoDelete, count is " + conversationInfoList.size());
+  }
+
+  /// 总的未读数变化回调
+  @Override
+  public void onTotalUnreadMessageCountUpdate(int count) {
+      Log.i("TAG", "onTotalUnreadMessageCountUpdate, count is " + count);
+  }
+});
+
+```
+
+</TabItem>
+
+<TabItem value="ios">
+
+可以设置多个代理。
+
+```objectivec
+[JIM.shared.conversationManager addDelegate:self];
+
+/// 会话新增回调
+- (void)conversationInfoDidAdd:(NSArray<JConversationInfo *> *)conversationInfoList {
+    NSLog(@"conversationInfoDidAdd");
+}
+
+/// 会话变更回调，会话信息任何变更都会触发该回调
+- (void)conversationInfoDidUpdate:(NSArray<JConversationInfo *> *)conversationInfoList {
+    NSLog(@"conversationInfoDidUpdate");
+}
+
+/// 会话删除回调
+- (void)conversationInfoDidDelete:(NSArray<JConversationInfo *> *)conversationInfoList {
+    NSLog(@"conversationInfoDidDelete");
+}
+
+/// 总的未读数变化回调
+- (void)totalUnreadMessageCountDidUpdate:(int)count {
+    NSLog(@"totalUnreadMessageCountDidUpdate");
+}
+
+```
+
+</TabItem>
+<TabItem value="js">
+
+**接口说明**：会话新增、删除、变更监听，全局只需设置一次，多次设置会覆盖
+
+**相关枚举**：[Conversation](/docs/client/sdkintro/conversation/)、[Event](/docs/client/sdkintro/enum/web/#listener)
+
+```js
+let { Event } = JIM;
+
+// 会话新增监听：首次收发消息、本地插入会话以及多端会话操作的同步操作
+jim.on(Event.CONVERSATION_ADDED, ({ conversations }) => {
+  console.log(conversations);
+});
+
+// 会话删除监听：主动调用删除会话接口、当前用户其他端调用删除会话同步至当前端
+jim.on(Event.CONVERSATION_REMOVED, ({ conversations }) => {
+  console.log(conversations);
+});
+
+// 会话变更监听：非首次收发消息（首次收发消息触发会话新增事件）、删除消息、修改消息、免打扰、置顶以及多端会话操作的同步操作
+jim.on(Event.CONVERSATION_CHANGED, ({ conversations }) => {
+  console.log(conversations);
+});
+```
+</TabItem>
+
+<TabItem value="harmony">
+
+可以设置多个监听。
+
+```js
+//会话新增监听
+JuggleIm.instance.getConversationManager().addConversationAddListener((convers)=>{
+
+})
+//会话变更监听
+JuggleIm.instance.getConversationManager().addConversationUpdateListener((convers)=>{
+
+})
+//会话删除监听
+JuggleIm.instance.getConversationManager().addConversationDeleteListener((convers)=>{
+
+})
+//总未读数变更监听
+JuggleIm.instance.getConnectionManager().addTotalUnreadCountUpdateListener((count)=>{
+
+})
+
+```
+
+</TabItem>
+<TabItem value="reactnative">
+
+可以设置多个监听，每个监听需要指定唯一的 key，返回的函数可用于取消监听。
+
+**示例代码**
+
+```typescript
+import JuggleIM from 'juggleim-rnsdk';
+
+// 添加会话监听，返回取消监听的函数
+const unsubscribeConversation = JuggleIM.addConversationListener('conversation_key', {
+  // 会话新增回调，首次收发消息、本地插入会话以及多端会话操作的同步操作
+  onConversationInfoAdd: (conversations) => {
+    console.log('New conversations:', conversations);
+  },
+
+  // 会话变更回调，非首次收发消息（首次收发消息触发会话新增事件）、删除消息、修改消息、免打扰、置顶以及多端会话操作的同步操作
+  onConversationInfoUpdate: (conversations) => {
+    console.log('Updated conversations:', conversations);
+  },
+
+  // 会话删除回调，主动调用删除会话接口、当前用户其他端调用删除会话同步至当前端
+  onConversationInfoDelete: (conversations) => {
+    console.log('Deleted conversations:', conversations);
+  },
+
+  // 总的未读数变化回调，收到计数的消息（如文本、图片等）、清理未读数等涉及未读数变化的操作均会触发。
+  onTotalUnreadMessageCountUpdate: (count) => {
+    console.log('Total unread count updated:', count);
+  }
+});
+
+// 取消监听
+// unsubscribeConversation();
+```
+
+</TabItem>
+<TabItem value="flutter" label="Flutter">
+
+连接监听仅支持设置一次，多次设置会覆盖之前的监听，如果有多处监听，建议在一个监听中处理所有状态，在业务层进行做二次事件分发。
+
+
+
+```dart
+// 会话新增回调，首次收发消息、本地插入会话以及多端会话操作的同步操作
+JuggleIm.instance.onConversationInfoAdd = (List<ConversationInfo> conversations){
+};
+
+// 会话变更回调，非首次收发消息（首次收发消息触发会话新增事件）、删除消息、修改消息、免打扰、置顶以及多端会话操作的同步操作
+JuggleIm.instance.onConversationInfoUpdate = (List<ConversationInfo> conversations){
+};
+
+// 会话删除回调，主动调用删除会话接口、当前用户其他端调用删除会话同步至当前端
+JuggleIm.instance.onConversationInfoDelete = (List<ConversationInfo> conversations){
+};
+
+// 总的未读数变化回调，收到计数的消息（如文本、图片等）、清理未读数等涉及未读数变化的操作均会触发。
+JuggleIm.instance.onTotalUnreadMessageCountUpdate = (list) {
+};
+```
+
+</TabItem>
+</Tabs>

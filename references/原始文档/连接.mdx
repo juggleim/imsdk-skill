@@ -1,0 +1,203 @@
+---
+title: 连接方法
+hide_title: true
+sidebar_position: 1
+---
+
+<Tabs
+groupId="sdks-language"
+values={[
+{ label: 'Android', value: 'android', },
+{ label: 'iOS', value: 'ios', },
+{ label: 'JavaScript', value: 'js', },
+{ label: 'Flutter', value: 'flutter', },
+{ label: 'ReactNative', value: 'reactnative', },
+{ label: '鸿蒙', value: 'harmony', }
+]
+}>
+<TabItem value="android">
+
+**连接**
+
+SDK 连接 IM Server 是异步的， 连接的状态会通过，[连接监听](/docs/client/sdkintro/watcher/connect/) 返回，请在初始化之前优先设置连接监听。
+
+可以在 onDbOpen() 的回调中进行会话和消息界面的展示。
+
+可以在 onStatusChange() 的回调中，当连接状态变为 JIMConst.ConnectionStatus.CONNECTED 时进行消息的发送。
+
+开发者只需调用 connect 一次，之后 SDK 会打开数据库，建立网络连接，并负责之后所有的断线重连逻辑。
+
+只有出现 SDK 无法处理的情况之后才需要开发者介入，比如 Token 无效、App 被封禁等。
+
+可以在监听到 JIMConst.ConnectionStatus.FAILURE 状态时根据错误码进行相应的处理。
+
+```java
+JIM.getInstance().getConnectionManager().connect("token");
+```
+
+
+**断开连接**
+
+断开连接的时候，可以选择是否继续接收消息推送。
+
+
+```java
+// true 表示断开连接后还继续接收推送
+// false 表示断开连接之后不再接收推送
+JIM.getInstance().getConnectionManager().disconnect(false);
+```
+
+
+</TabItem>
+<TabItem value="ios">
+
+**连接**
+
+调用连接之后，请注册[连接监听](/docs/client/sdkintro/watcher/connect/)来进行后续的业务处理。
+
+可以在 dbDidOpen 的回调中进行会话和消息界面的展示。
+
+可以在 connectionStatusDidChange:errorCode 回调中，连接状态变为 JConnectionStatusConnected 时进行消息的发送。
+
+开发者只需调用 connectWithToken 一次，之后 SDK 会打开数据库，建立网络连接，并负责之后所有的断线重连逻辑。
+
+只有出现 SDK 无法处理的情况之后才需要开发者介入，比如 Token 无效、App 被封禁等。
+
+开发者可以在监听到 JConnectionStatusFailure 状态时根据错误码进行相应的处理。
+
+```objectivec
+[JIM.shared.connectionManager connectWithToken:@"token"];
+```
+
+**断开连接**
+
+断开连接的时候，可以选择是否继续接收消息推送。
+
+```objectivec
+// YES 表示断开连接后还继续接收推送
+// NO 表示断开连接之后不再接收推送
+[JIM.shared.connectionManager disconnect:NO];
+```
+
+
+</TabItem>
+<TabItem value="js">
+
+**参数说明**
+
+| 参数    | 类型    | 必填 |说明                                   | 最低版本    |
+|-----------|---------|-------|----------------------------------------|----------|
+| user     | Object  | 是  |  | 1.0.0    |
+| user.token     | String  | 是  | 用户的身份验证令牌，根据 [IM Server](/docs/server/user/register/) 约定规则在开发者的服务端生成 | 1.0.0    |
+
+**回调说明**
+
+| 属性            | 类型    | 描述                                           | 版本  |
+|----------------|---------|------------------------------------------------|----------|
+| error          | Object  | 连接结果                                       | 1.0.0    |
+| error.code     | Number  | 连接结果状态码，详细描述请查看 [连接状态码](/docs/client/sdkintro/status_code/web/#connect) | 1.0.0    |
+| error.msg      | String  | 连接结果的描述，详细描述请查看 [连接状态码](/docs/client/sdkintro/status_code/web/#connect) | 1.0.0    |
+
+**示例代码**
+
+```js
+let { ErrorType } = JIM;
+let jim = JIM.init({ appkey: 'Your AppKey' });
+
+let user = {
+  token: "CgZhcHBrZXkaIDAr072n8uOcw5YBeKCcQ+QCw4m6YWhgt99U787/dEJS"
+};
+
+jim.connect(user).then((user) => {
+  console.log('connect successfully', user);
+}, (error) => {
+  console.log('connect failed', error);
+});
+```
+
+</TabItem>
+
+<TabItem value="flutter">
+
+**连接**
+
+调用连接之后，请注册[连接监听](/docs/client/sdkintro/watcher/connect/)来进行后续的业务处理。
+
+开发者只需调用 connect 一次，之后 SDK 会打开数据库，建立网络连接，并负责之后所有的断线重连逻辑。
+
+只有出现 `SDK` 无法处理的情况之后才需要开发者介入，比如 `Token 无效`、`App 被封禁` 等。
+
+开发者可以在监听到 `SDKConnectionStatus.FAILURE` 状态时根据错误码进行相应的处理。
+
+```dart
+await _juggleImPlugin.connect('token');
+```
+
+**断开连接**
+
+断开连接的时候，可以选择是否继续接收消息推送。
+
+```dart
+// true 表示断开连接后还继续接收推送
+// false 表示断开连接之后不再接收推送
+await JuggleIm.instance.disconnect(false);
+```
+
+</TabItem>
+
+<TabItem value="reactnative">
+
+**连接**
+
+调用连接之后，请注册[连接监听](/docs/client/sdkintro/watcher/connect/)来进行后续的业务处理。
+
+开发者只需调用 connect 一次，之后 SDK 会打开数据库，建立网络连接，并负责之后所有的断线重连逻辑。
+
+只有出现 SDK 无法处理的情况之后才需要开发者介入，比如 Token 无效、App 被封禁等。
+
+开发者可以在监听到 ConnectionStatus.FAILURE 状态时根据错误码进行相应的处理。
+
+**参数说明**
+
+| 参数    | 类型    | 必填 | 说明                                   | 最低版本    |
+|-----------|---------|-------|----------------------------------------|----------|
+| token     | String  | 是  | 用户的身份验证令牌，根据 [IM Server](/docs/server/user/register/) 约定规则在开发者的服务端生成 | 1.0.0    |
+
+**示例代码**
+
+```typescript
+import JuggleIM from 'juggleim-rnsdk';
+
+JuggleIM.connect('your-token');
+```
+
+**断开连接**
+
+断开连接的时候，可以选择是否继续接收消息推送。
+
+**参数说明**
+
+| 参数    | 类型    | 必填 | 说明                                   | 最低版本    |
+|-----------|---------|-------|----------------------------------------|----------|
+| pushable     | Boolean  | 是  | true 表示断开连接后还继续接收推送，false 表示断开连接之后不再接收推送 | 1.0.0    |
+
+**示例代码**
+
+```typescript
+// true 表示断开连接后还继续接收推送
+// false 表示断开连接之后不再接收推送
+JuggleIM.disconnect(false);
+```
+
+</TabItem>
+
+<TabItem value="harmony">
+
+**示例代码**
+
+```js
+JuggleIm.instance.getConnectionManager().connect("{token}")
+```
+
+</TabItem>
+</Tabs>
