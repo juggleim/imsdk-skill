@@ -4,7 +4,7 @@
 
 ## 依赖与初始化
 
-[依赖引入文档](原始文档/依赖引入.md)给出 CocoaPods 示例：`pod 'JuggleIM', '1.8.13.2'`，随后执行 `pod install`。版本号属于文档快照，接入时核对项目要用的版本。
+[依赖引入文档](原始文档/依赖引入.md)给出 CocoaPods 示例：`pod 'JuggleIM', '1.8.52.4'`，随后执行 `pod install`。版本号属于文档快照，接入时核对项目要用的版本。
 
 演示工程在 `AppDelegate.swift` 中先设置 IM 服务地址，再初始化：
 

@@ -4,7 +4,7 @@
 
 ## 依赖与初始化
 
-[依赖引入文档](原始文档/依赖引入.md)给出 Maven 仓库 `https://repo.juggle.im/repository/maven-releases/` 和示例坐标 `com.juggle.im:juggle:1.8.13.2`。版本号属于文档快照，接入时核对项目要用的版本。
+[依赖引入文档](原始文档/依赖引入.md)给出 Maven 仓库 `https://repo.juggle.im/repository/maven-releases/` 和示例坐标 `com.juggle.im:juggle:1.8.51.2`。版本号属于文档快照，接入时核对项目要用的版本。
 
 [初始化文档](原始文档/初始化.mdx)和演示工程均先设置服务地址，再初始化单例。以下片段保留演示工程的调用顺序，并用占位值替换测试配置：
 
