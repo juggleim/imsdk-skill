@@ -4,13 +4,25 @@
 
 ## 安装
 
-将仓库克隆到 Codex 的 skills 目录，目录名与 Skill 名称保持一致：
+推荐使用 [Skills CLI](https://github.com/vercel-labs/skills) 安装。需要 Node.js 和 npx；下面的命令会把 skill 安装到 Codex 的用户级目录，供所有项目使用：
+
+```bash
+npx skills add juggleim/imsdk-skill -g -a codex
+```
+
+如果只想在当前项目中使用，去掉 `-g`：
+
+```bash
+npx skills add juggleim/imsdk-skill -a codex
+```
+
+也可以不依赖 Skills CLI，手动克隆到 Codex 的 skills 目录，目录名与 Skill 名称保持一致：
 
 ```bash
 git clone https://github.com/juggleim/imsdk-skill.git ~/.codex/skills/integrate-juggle-im-sdk
 ```
 
-如果使用其他支持 Agent Skills 的工具，请将整个仓库放入该工具的 skills 目录，确保目录下直接包含 `SKILL.md` 和 `references/`。
+如果使用其他支持 Agent Skills 的工具，可在 Skills CLI 的交互提示中选择目标工具，或将整个仓库放入该工具的 skills 目录。确保 skill 目录下直接包含 `SKILL.md` 和 `references/`。
 
 ## 使用
 
