@@ -4,31 +4,31 @@
 
 ## 安装
 
-推荐使用 [Skills CLI](https://github.com/vercel-labs/skills) 安装。需要 Node.js 和 npx；下面的命令会把 skill 安装到 Codex 的用户级目录，供所有项目使用：
+推荐使用 [Skills CLI](https://github.com/vercel-labs/skills) 安装。需要 Node.js 和 npx；运行后选择使用的编码助手。以下命令安装到用户级目录，供所有项目使用：
 
 ```bash
-npx skills add juggleim/imsdk-skill -g -a codex
+npx skills add juggleim/imsdk-skill -g
 ```
 
 如果只想在当前项目中使用，去掉 `-g`：
 
 ```bash
-npx skills add juggleim/imsdk-skill -a codex
+npx skills add juggleim/imsdk-skill
 ```
 
-也可以不依赖 Skills CLI，手动克隆到 Codex 的 skills 目录，目录名与 Skill 名称保持一致：
+也可以不依赖 Skills CLI，先克隆仓库，再把整个目录放入所用编码助手指定的 skills 目录，确保目录下直接包含 `SKILL.md` 和 `references/`：
 
 ```bash
-git clone https://github.com/juggleim/imsdk-skill.git ~/.codex/skills/integrate-juggle-im-sdk
+git clone https://github.com/juggleim/imsdk-skill.git
 ```
 
-如果使用其他支持 Agent Skills 的工具，可在 Skills CLI 的交互提示中选择目标工具，或将整个仓库放入该工具的 skills 目录。确保 skill 目录下直接包含 `SKILL.md` 和 `references/`。
+Skill 遵循目录式 Agent Skills 结构，不限定编码助手。安装位置和显式调用方式以所用工具的说明为准。
 
 ## 使用
 
 在开发项目中描述目标平台与任务，例如：
 
-> 使用 `$integrate-juggle-im-sdk`，帮我在 Android 项目中接入 JuggleIM，完成初始化、Token 连接和文本消息收发。
+> 请使用 integrate-juggle-im-sdk，在 Android 项目中接入 JuggleIM，完成初始化、Token 连接和文本消息收发。
 
 使用前准备好应用标识、实际部署的 IM 服务地址，以及由业务服务端签发的用户 IM Token。Skill 会先检查目标项目已安装的 SDK 版本，再按平台查阅参考资料；示例中的版本号和配置值不能直接当作生产环境配置。
 
